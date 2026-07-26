@@ -1,0 +1,164 @@
+.weekly-schedule {
+  --fc-border-color: rgba(148, 163, 184, 0.16);
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: rgba(15, 23, 42, 0.55);
+  --fc-list-event-hover-bg-color: rgba(255, 255, 255, 0.04);
+  --fc-today-bg-color: rgba(59, 130, 246, 0.08);
+  --fc-now-indicator-color: #ef4444;
+  --fc-event-text-color: #f8fafc;
+  color: #f8fafc;
+}
+
+/* toolbar */
+.weekly-schedule .fc .fc-toolbar {
+  margin-bottom: 1.75rem;
+  gap: 1rem;
+}
+
+.weekly-schedule .fc .fc-toolbar-title {
+  font-size: 1.65rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #f8fafc;
+}
+
+/* buttons */
+.weekly-schedule .fc .fc-button {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 10px;
+  padding: 0.6rem 0.95rem;
+  background: #172033;
+  color: #e2e8f0;
+  box-shadow: none;
+  text-transform: none;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.weekly-schedule .fc .fc-button:hover {
+  background: #22304a;
+  border-color: rgba(148, 163, 184, 0.3);
+  transform: translateY(-1px);
+}
+
+.weekly-schedule .fc .fc-button:focus {
+  box-shadow: none;
+}
+
+.weekly-schedule .fc .fc-button-primary:not(:disabled).fc-button-active {
+  background: #6d28d9;
+  border-color: #7c3aed;
+  color: white;
+}
+
+.weekly-schedule .fc .fc-today-button:disabled {
+  opacity: 0.45;
+}
+
+/* calendar grid */
+.weekly-schedule .fc .fc-scrollgrid {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.weekly-schedule .fc-theme-standard td,
+.weekly-schedule .fc-theme-standard th {
+  border-color: rgba(148, 163, 184, 0.16);
+}
+
+.weekly-schedule .fc .fc-col-header-cell {
+  background: rgba(15, 23, 42, 0.7);
+  padding: 0.75rem 0.25rem;
+}
+
+.weekly-schedule .fc .fc-col-header-cell-cushion {
+  color: #cbd5e1;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.weekly-schedule .fc .fc-timegrid-slot-label-cushion {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  padding-right: 0.75rem;
+}
+
+.weekly-schedule .fc .fc-timegrid-axis {
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.weekly-schedule .fc .fc-timegrid-slot {
+  height: 3.5rem;
+}
+
+.weekly-schedule .fc .fc-timegrid-slot-lane {
+  background: rgba(9, 13, 22, 0.24);
+}
+
+.weekly-schedule .fc .fc-timegrid-col.fc-day-today {
+  background: rgba(109, 40, 217, 0.07);
+}
+
+/* events */
+.weekly-schedule .fc .fc-event {
+  border: none;
+  border-radius: 10px;
+  padding: 4px 6px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+  transition:
+    transform 0.18s ease,
+    filter 0.18s ease;
+}
+
+.weekly-schedule .fc .fc-event:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.12);
+}
+
+.weekly-schedule .fc .fc-event-main {
+  padding: 3px;
+}
+
+.weekly-schedule .fc .fc-event-title {
+  font-weight: 700;
+}
+
+.weekly-schedule .fc .fc-event-time {
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+/* διαφορετικά session styles */
+.weekly-schedule .fc .event-yoga {
+  background: linear-gradient(135deg, #6d28d9, #4c1d95);
+}
+
+.weekly-schedule .fc .event-crossfit {
+  background: linear-gradient(135deg, #dc2626, #7f1d1d);
+}
+
+.weekly-schedule .fc .event-pilates {
+  background: linear-gradient(135deg, #2563eb, #1e3a8a);
+}
+
+/* mobile */
+@media (max-width: 900px) {
+  .weekly-schedule .fc .fc-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .weekly-schedule .fc .fc-toolbar-chunk {
+    display: flex;
+    justify-content: center;
+  }
+
+  .weekly-schedule .fc .fc-toolbar-title {
+    font-size: 1.25rem;
+  }
+}
