@@ -99,7 +99,6 @@ function RegisterPage() {
           }}
         >
           <Logo
-            text="Gym App"
             subtitle="Create your account"
           />
 
