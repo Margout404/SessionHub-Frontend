@@ -137,6 +137,31 @@ function AppNavbar() {
             >
               Οι κρατήσεις μου
             </Button>
+
+            {user?.role === "ADMIN" && (
+              <Button
+                component={NavLink}
+                to="/admin/sessions"
+                sx={{
+                  px: 2,
+                  color: "text.secondary",
+                  textTransform: "none",
+                  borderRadius: 2.5,
+
+                  "&.active": {
+                    color: "primary.main",
+                    backgroundColor: "rgba(109, 40, 217, 0.12)",
+                  },
+
+                  "&:hover": {
+                    color: "text.primary",
+                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  },
+                }}
+              >
+                Διαχείριση Sessions
+              </Button>
+            )}
           </Box>
 
           <Tooltip title="Άνοιγμα προφίλ">

@@ -43,8 +43,6 @@ function SchedulePage() {
             p: { xs: 1.5, md: 3 },
             borderRadius: 4,
             border: "1px solid rgba(148, 163, 184, 0.18)",
-            background:
-              "linear-gradient(180deg, rgba(18,24,38,0.98), rgba(10,15,25,0.98))",
             boxShadow: "0 24px 70px rgba(0,0,0,0.35)",
             overflow: "hidden",
           }}
