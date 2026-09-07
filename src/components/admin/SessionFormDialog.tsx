@@ -48,7 +48,6 @@ const emptyForm: SessionFormData = {
   startTime: "",
   endTime: "",
   maxParticipants: 10,
-  description: "",
   status: "DRAFT",
 };
 
@@ -68,7 +67,6 @@ function createInitialForm(
       startTime: session.startTime,
       endTime: session.endTime,
       maxParticipants: session.maxParticipants,
-      description: session.description ?? "",
       status: session.status,
     };
   }
@@ -285,14 +283,6 @@ function SessionFormDialog({
                 min: 1,
               },
             }}
-          />
-
-          <TextField
-            label="Περιγραφή"
-            value={form.description}
-            onChange={(event) => updateField("description", event.target.value)}
-            multiline
-            minRows={3}
           />
 
           <FormControl fullWidth>

@@ -184,12 +184,9 @@ function AdminSessionsPage() {
 
       handleCloseDialog();
 
-if (currentRange) {
-  await loadSessions(
-    currentRange.from,
-    currentRange.to,
-  );
-}
+      if (currentRange) {
+        await loadSessions(currentRange.from, currentRange.to);
+      }
     } catch (error) {
       console.error("Create session failed:", error);
 
@@ -205,12 +202,9 @@ if (currentRange) {
 
       handleCloseDialog();
 
-if (currentRange) {
-  await loadSessions(
-    currentRange.from,
-    currentRange.to,
-  );
-}
+      if (currentRange) {
+        await loadSessions(currentRange.from, currentRange.to);
+      }
     } catch (error) {
       console.error("Delete session failed:", error);
     }
@@ -230,12 +224,10 @@ if (currentRange) {
 
       setSuccessMessage("Τα sessions δημοσιεύτηκαν επιτυχώς.");
 
-if (currentRange) {
-  await loadSessions(
-    currentRange.from,
-    currentRange.to,
-  );
-}    } catch (error) {
+      if (currentRange) {
+        await loadSessions(currentRange.from, currentRange.to);
+      }
+    } catch (error) {
       console.error("Publish failed:", error);
     }
   };
@@ -266,6 +258,12 @@ if (currentRange) {
       {optionsError && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {optionsError}
+        </Alert>
+      )}
+
+      {sessionsError && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {sessionsError}
         </Alert>
       )}
 

@@ -13,8 +13,7 @@ import {
 
 const initialSessions: TrainingSession[] = [
   {
-    id: 1,
-    description: "Beginner-friendly yoga class.",
+    sessionId: 1,
     date: "2026-07-27",
     startTime: "18:00",
     endTime: "19:00",
@@ -29,13 +28,10 @@ const initialSessions: TrainingSession[] = [
     trainingTypeName: "Yoga",
 
     maxParticipants: 12,
-    participants: 6,
-
-    status: "PUBLISHED",
+    status: "SCHEDULED",
   },
   {
-    id: 2,
-    description: "High intensity training.",
+    sessionId: 2,
     date: "2026-07-28",
     startTime: "19:00",
     endTime: "20:00",
@@ -50,7 +46,6 @@ const initialSessions: TrainingSession[] = [
     trainingTypeName: "CrossFit",
 
     maxParticipants: 10,
-    participants: 8,
 
     status: "DRAFT",
   },
@@ -83,9 +78,8 @@ export function useAdminSessions() {
     }
 
     const newSession: TrainingSession = {
-      id: Date.now(),
+      sessionId: Date.now(),
 
-      description: formData.description,
       date: formData.date,
       startTime: formData.startTime,
       endTime: formData.endTime,
@@ -102,7 +96,6 @@ export function useAdminSessions() {
       maxParticipants:
         formData.maxParticipants,
 
-      participants: 0,
       status: formData.status,
     };
 
@@ -140,14 +133,13 @@ export function useAdminSessions() {
 
     setSessions((currentSessions) =>
       currentSessions.map((session) => {
-        if (session.id !== formData.id) {
+        if (session.sessionId !== formData.id) {
           return session;
         }
 
         return {
           ...session,
 
-          description: formData.description,
           date: formData.date,
           startTime: formData.startTime,
           endTime: formData.endTime,
@@ -174,7 +166,7 @@ export function useAdminSessions() {
   const deleteSession = (sessionId: number) => {
     setSessions((currentSessions) =>
       currentSessions.filter(
-        (session) => session.id !== sessionId,
+        (session) => session.sessionId !== sessionId,
       ),
     );
   };

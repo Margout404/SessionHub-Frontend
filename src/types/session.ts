@@ -48,7 +48,6 @@ export type SessionFormData = {
   endTime: string;
 
   maxParticipants: number;
-  description: string;
   status: SessionStatus;
 };
 
