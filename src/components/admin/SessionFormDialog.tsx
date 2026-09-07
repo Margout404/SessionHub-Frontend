@@ -14,6 +14,9 @@ import {
   TextField,
 } from "@mui/material";
 import { useState } from "react";
+import type { TrainerResponse } from "../../types/trainerResponse";
+import type { TrainingRoomResponse } from "../../types/trainingRoomResponse";
+import type { TrainingTypeResponse } from "../../types/trainingTypeResponse";
 
 import type {
   SessionFormData,
@@ -21,20 +24,17 @@ import type {
   TrainingSession,
 } from "../../types/session";
 
-type Option = {
-  id: number;
-  name: string;
-};
-
 type SessionFormDialogProps = {
   open: boolean;
   session?: TrainingSession | null;
   initialDate?: string;
   initialStartTime?: string;
   initialEndTime?: string;
-  trainers: Option[];
-  rooms: Option[];
-  trainingTypes: Option[];
+
+  trainers: TrainerResponse[];
+  rooms: TrainingRoomResponse[];
+  trainingTypes: TrainingTypeResponse[];
+
   onClose: () => void;
   onSave: (data: SessionFormData) => void;
   onDelete?: (sessionId: number) => void;
@@ -60,7 +60,7 @@ function createInitialForm(
 ): SessionFormData {
   if (session) {
     return {
-      id: session.id,
+      id: session.sessionId,
       trainingTypeId: session.trainingTypeId,
       trainerId: session.trainerId,
       roomId: session.roomId,
@@ -95,12 +95,7 @@ function SessionFormDialog({
   onDelete,
 }: SessionFormDialogProps) {
   const [form, setForm] = useState<SessionFormData>(() =>
-    createInitialForm(
-      session,
-      initialDate,
-      initialStartTime,
-      initialEndTime,
-    ),
+    createInitialForm(session, initialDate, initialStartTime, initialEndTime),
   );
 
   const [error, setError] = useState("");
@@ -115,39 +110,23 @@ function SessionFormDialog({
     }));
   };
   const validate = () => {
-    if (
-      !form.trainingTypeId ||
-      !form.trainerId ||
-      !form.roomId
-    ) {
-      setError(
-        "Επίλεξε training type, trainer και αίθουσα.",
-      );
+    if (!form.trainingTypeId || !form.trainerId || !form.roomId) {
+      setError("Επίλεξε training type, trainer και αίθουσα.");
       return false;
     }
 
-    if (
-      !form.date ||
-      !form.startTime ||
-      !form.endTime
-    ) {
-      setError(
-        "Συμπλήρωσε ημερομηνία και ώρες.",
-      );
+    if (!form.date || !form.startTime || !form.endTime) {
+      setError("Συμπλήρωσε ημερομηνία και ώρες.");
       return false;
     }
 
     if (form.startTime >= form.endTime) {
-      setError(
-        "Η ώρα λήξης πρέπει να είναι μετά την ώρα έναρξης.",
-      );
+      setError("Η ώρα λήξης πρέπει να είναι μετά την ώρα έναρξης.");
       return false;
     }
 
     if (form.maxParticipants < 1) {
-      setError(
-        "Η χωρητικότητα πρέπει να είναι τουλάχιστον 1.",
-      );
+      setError("Η χωρητικότητα πρέπει να είναι τουλάχιστον 1.");
       return false;
     }
 
@@ -168,27 +147,18 @@ function SessionFormDialog({
       return;
     }
 
-    onDelete(session.id);
+    onDelete(session.sessionId);
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      fullWidth
-      maxWidth="sm"
-    >
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>
-        {session
-          ? "Επεξεργασία Session"
-          : "Νέο Session"}
+        {session ? "Επεξεργασία Session" : "Νέο Session"}
       </DialogTitle>
 
       <DialogContent>
         <Stack spacing={2.5} sx={{ mt: 1 }}>
-          {error && (
-            <Alert severity="error">{error}</Alert>
-          )}
+          {error && <Alert severity="error">{error}</Alert>}
 
           <FormControl fullWidth>
             <InputLabel>Training Type</InputLabel>
@@ -197,10 +167,7 @@ function SessionFormDialog({
               label="Training Type"
               value={form.trainingTypeId}
               onChange={(event) =>
-                updateField(
-                  "trainingTypeId",
-                  Number(event.target.value),
-                )
+                updateField("trainingTypeId", Number(event.target.value))
               }
             >
               <MenuItem value={0} disabled>
@@ -209,7 +176,7 @@ function SessionFormDialog({
 
               {trainingTypes.map((type) => (
                 <MenuItem key={type.id} value={type.id}>
-                  {type.name}
+                  {type.name} · {type.duration} min
                 </MenuItem>
               ))}
             </Select>
@@ -222,10 +189,7 @@ function SessionFormDialog({
               label="Trainer"
               value={form.trainerId}
               onChange={(event) =>
-                updateField(
-                  "trainerId",
-                  Number(event.target.value),
-                )
+                updateField("trainerId", Number(event.target.value))
               }
             >
               <MenuItem value={0} disabled>
@@ -233,11 +197,8 @@ function SessionFormDialog({
               </MenuItem>
 
               {trainers.map((trainer) => (
-                <MenuItem
-                  key={trainer.id}
-                  value={trainer.id}
-                >
-                  {trainer.name}
+                <MenuItem key={trainer.id} value={trainer.id}>
+                  {trainer.firstName} {trainer.lastName}
                 </MenuItem>
               ))}
             </Select>
@@ -250,10 +211,7 @@ function SessionFormDialog({
               label="Αίθουσα"
               value={form.roomId}
               onChange={(event) =>
-                updateField(
-                  "roomId",
-                  Number(event.target.value),
-                )
+                updateField("roomId", Number(event.target.value))
               }
             >
               <MenuItem value={0} disabled>
@@ -262,7 +220,7 @@ function SessionFormDialog({
 
               {rooms.map((room) => (
                 <MenuItem key={room.id} value={room.id}>
-                  {room.name}
+                  {room.name} · {room.capacity} άτομα
                 </MenuItem>
               ))}
             </Select>
@@ -272,9 +230,7 @@ function SessionFormDialog({
             label="Ημερομηνία"
             type="date"
             value={form.date}
-            onChange={(event) =>
-              updateField("date", event.target.value)
-            }
+            onChange={(event) => updateField("date", event.target.value)}
             slotProps={{
               inputLabel: {
                 shrink: true,
@@ -296,12 +252,7 @@ function SessionFormDialog({
               label="Ώρα έναρξης"
               type="time"
               value={form.startTime}
-              onChange={(event) =>
-                updateField(
-                  "startTime",
-                  event.target.value,
-                )
-              }
+              onChange={(event) => updateField("startTime", event.target.value)}
               slotProps={{
                 inputLabel: {
                   shrink: true,
@@ -313,12 +264,7 @@ function SessionFormDialog({
               label="Ώρα λήξης"
               type="time"
               value={form.endTime}
-              onChange={(event) =>
-                updateField(
-                  "endTime",
-                  event.target.value,
-                )
-              }
+              onChange={(event) => updateField("endTime", event.target.value)}
               slotProps={{
                 inputLabel: {
                   shrink: true,
@@ -332,10 +278,7 @@ function SessionFormDialog({
             type="number"
             value={form.maxParticipants}
             onChange={(event) =>
-              updateField(
-                "maxParticipants",
-                Number(event.target.value),
-              )
+              updateField("maxParticipants", Number(event.target.value))
             }
             slotProps={{
               htmlInput: {
@@ -347,12 +290,7 @@ function SessionFormDialog({
           <TextField
             label="Περιγραφή"
             value={form.description}
-            onChange={(event) =>
-              updateField(
-                "description",
-                event.target.value,
-              )
-            }
+            onChange={(event) => updateField("description", event.target.value)}
             multiline
             minRows={3}
           />
@@ -364,23 +302,14 @@ function SessionFormDialog({
               label="Status"
               value={form.status}
               onChange={(event) =>
-                updateField(
-                  "status",
-                  event.target.value as SessionStatus,
-                )
+                updateField("status", event.target.value as SessionStatus)
               }
             >
-              <MenuItem value="DRAFT">
-                Draft
-              </MenuItem>
+              <MenuItem value="DRAFT">Draft</MenuItem>
 
-              <MenuItem value="PUBLISHED">
-                Published
-              </MenuItem>
+              <MenuItem value="PUBLISHED">Published</MenuItem>
 
-              <MenuItem value="CANCELLED">
-                Cancelled
-              </MenuItem>
+              <MenuItem value="CANCELLED">Cancelled</MenuItem>
             </Select>
           </FormControl>
         </Stack>
@@ -395,27 +324,17 @@ function SessionFormDialog({
       >
         <Box>
           {session && onDelete && (
-            <Button
-              color="error"
-              onClick={handleDelete}
-            >
+            <Button color="error" onClick={handleDelete}>
               Διαγραφή
             </Button>
           )}
         </Box>
 
         <Box sx={{ display: "flex", gap: 1 }}>
-          <Button onClick={onClose}>
-            Ακύρωση
-          </Button>
+          <Button onClick={onClose}>Ακύρωση</Button>
 
-          <Button
-            variant="contained"
-            onClick={handleSubmit}
-          >
-            {session
-              ? "Αποθήκευση"
-              : "Δημιουργία"}
+          <Button variant="contained" onClick={handleSubmit}>
+            {session ? "Αποθήκευση" : "Δημιουργία"}
           </Button>
         </Box>
       </DialogActions>

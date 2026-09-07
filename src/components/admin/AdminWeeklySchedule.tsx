@@ -9,20 +9,15 @@ import type { TrainingSession } from "../../types/session";
 import interactionPlugin from "@fullcalendar/interaction";
 import "../schedule/weeklySchedule.css";
 
-
 type AdminWeeklyScheduleProps = {
   sessions: TrainingSession[];
   onSelectSlot: (selection: DateSelectArg) => void;
-  onSessionClick: (
-    session: TrainingSession,
-  ) => void;
+  onSessionClick: (session: TrainingSession) => void;
+  onDatesChange: (from: string, to: string) => void;
 };
 
-function getSessionClassName(
-  session: TrainingSession,
-): string {
-  const typeName =
-    session.trainingTypeName.toLowerCase();
+function getSessionClassName(session: TrainingSession): string {
+  const typeName = session.trainingTypeName.toLowerCase();
 
   if (typeName === "yoga") {
     return "event-yoga";
@@ -43,26 +38,24 @@ function AdminWeeklySchedule({
   sessions,
   onSelectSlot,
   onSessionClick,
+  onDatesChange,
 }: AdminWeeklyScheduleProps) {
-  const events: EventInput[] = sessions.map(
-    (session) => ({
-      id: String(session.id),
-      title: `${session.trainingTypeName} · ${session.roomName}`,
-      start: `${session.date}T${session.startTime}`,
-      end: `${session.date}T${session.endTime}`,
-      extendedProps: {
-        session,
-      },
-      classNames: [
-        getSessionClassName(session),
-        `session-status-${session.status.toLowerCase()}`,
-      ],
-    }),
-  );
+  const events: EventInput[] = sessions.map((session) => ({
+    id: String(session.sessionId),
+    title: `${session.trainingTypeName} · ${session.roomName}`,
+    start: `${session.date}T${session.startTime}`,
+    end: `${session.date}T${session.endTime}`,
+    extendedProps: {
+      session,
+    },
+    classNames: [
+      getSessionClassName(session),
+      `session-status-${session.status.toLowerCase()}`,
+    ],
+  }));
 
   const handleEventClick = (info: EventClickArg) => {
-    const session =
-      info.event.extendedProps.session as TrainingSession;
+    const session = info.event.extendedProps.session as TrainingSession;
 
     onSessionClick(session);
   };
@@ -72,7 +65,6 @@ function AdminWeeklySchedule({
       <FullCalendar
         plugins={[timeGridPlugin, interactionPlugin]}
         initialView="timeGridWeek"
-        initialDate="2026-07-27"
         firstDay={1}
         allDaySlot={false}
         selectable
@@ -107,10 +99,24 @@ function AdminWeeklySchedule({
           week: "Εβδομάδα",
           day: "Ημέρα",
         }}
+        datesSet={(dateInfo) => {
+          const from = dateInfo.startStr.slice(0, 10);
+
+          const endDate = new Date(dateInfo.end);
+          endDate.setDate(endDate.getDate() - 1);
+
+          const to = endDate.toISOString().slice(0, 10);
+
+          onDatesChange(from, to);
+        }}
         eventContent={(eventInfo) => {
-          const session =
-            eventInfo.event.extendedProps
-              .session as TrainingSession;
+          const session = eventInfo.event.extendedProps.session as
+            | TrainingSession
+            | undefined;
+
+          if (!session) {
+            return null;
+          }
 
           return (
             <div>

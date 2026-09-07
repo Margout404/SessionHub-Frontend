@@ -13,18 +13,10 @@ export type TrainingSessionEvent = {
     description?: string;
   };
 };
-export type SessionStatus =
-  | "DRAFT"
-  | "PUBLISHED"
-  | "CANCELLED";
+export type SessionStatus = "DRAFT" | "SCHEDULED" | "CANCELLED";
 
 export type TrainingSession = {
-  id: number;
-  description?: string;
-
-  date: string;
-  startTime: string;
-  endTime: string;
+  sessionId: number;
 
   trainerId: number;
   trainerName: string;
@@ -35,8 +27,11 @@ export type TrainingSession = {
   trainingTypeId: number;
   trainingTypeName: string;
 
+  date: string;
+  startTime: string;
+  endTime: string;
+
   maxParticipants: number;
-  participants: number;
 
   status: SessionStatus;
 };
@@ -61,4 +56,34 @@ export type SelectedSessionRange = {
   date: string;
   startTime: string;
   endTime: string;
+};
+
+export type CreateSessionRequest = {
+  trainerId: number;
+  roomId: number;
+  trainingTypeId: number;
+
+  date: string;
+  startTime: string;
+  endTime: string;
+
+  maxParticipants: number;
+
+  status: "DRAFT";
+};
+
+export type CreateSessionResponse = {
+  trainerId: number;
+  roomId: number;
+  trainingTypeId: number;
+
+  date: string;
+  startTime: string;
+  endTime: string;
+
+  maxParticipants: number;
+  status: SessionStatus;
+
+  sessionId: number;
+  message: string;
 };

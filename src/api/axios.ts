@@ -10,13 +10,10 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
 
-  const publicEndpoints = [
-    "/auth/login",
-    "/auth/register",
-  ];
+  const publicEndpoints = ["/auth/login", "/auth/register"];
 
-  const isPublicEndpoint = publicEndpoints.some(
-    (endpoint) => config.url?.startsWith(endpoint),
+  const isPublicEndpoint = publicEndpoints.some((endpoint) =>
+    config.url?.startsWith(endpoint),
   );
 
   if (token && !isPublicEndpoint) {
@@ -25,5 +22,17 @@ apiClient.interceptors.request.use((config) => {
 
   return config;
 });
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+    }
+
+    return Promise.reject(error);
+  },
+);
 
 export default apiClient;

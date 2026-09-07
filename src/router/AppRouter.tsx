@@ -1,9 +1,4 @@
-import {
-  BrowserRouter,
-  Navigate,
-  Route,
-  Routes,
-} from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import MainLayout from "../layouts/MainLayout";
@@ -19,9 +14,9 @@ function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
+
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        
 
         <Route
           element={
@@ -30,42 +25,26 @@ function AppRouter() {
             </ProtectedRoute>
           }
         >
-          <Route
-            path="/schedule"
-            element={<SchedulePage />}
-          />
+          <Route path="/schedule" element={<SchedulePage />} />
+
+          <Route path="/my-bookings" element={<MyBookingsPage />} />
+
+          <Route path="/profile" element={<ProfilePage />} />
 
           <Route
-            path="/my-bookings"
-            element={<MyBookingsPage />}
+            path="/admin/sessions"
+            element={
+              <AdminRoute>
+                <AdminSessionsPage />
+              </AdminRoute>
+            }
           />
-
-          <Route
-            path="/profile"
-            element={<ProfilePage />}
-          />
-          <Route
-          path="/admin/sessions"
-          element={
-            <AdminRoute>
-              <AdminSessionsPage />
-            </AdminRoute>
-          }
-        />
         </Route>
-      
 
+        <Route path="/" element={<Navigate to="/schedule" replace />} />
 
-        <Route
-          path="/"
-          element={<Navigate to="/schedule" replace />}
-        />
+        <Route path="*" element={<Navigate to="/schedule" replace />} />
 
-        <Route
-          path="*"
-          element={<Navigate to="/schedule" replace />}
-        />
-        
       </Routes>
     </BrowserRouter>
   );

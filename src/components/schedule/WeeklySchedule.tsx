@@ -1,20 +1,56 @@
 import { useState } from "react";
+
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+
 import type {
   EventApi,
   EventClickArg,
+  EventInput,
 } from "@fullcalendar/core";
 
-import SessionDetailsDialog from "./SessionDetailsDialog.tsx";
+import SessionDetailsDialog from "./SessionDetailsDialog";
+import type { TrainingSession } from "../../types/session";
+
 import "./weeklySchedule.css";
 
-function WeeklySchedule() {
+type WeeklyScheduleProps = {
+  sessions: TrainingSession[];
+  onDatesChange: (
+    from: string,
+    to: string,
+  ) => void;
+};
+
+function WeeklySchedule({
+  sessions,
+  onDatesChange,
+}: WeeklyScheduleProps) {
   const [selectedSession, setSelectedSession] =
     useState<EventApi | null>(null);
 
-  const handleEventClick = (info: EventClickArg) => {
+  const events: EventInput[] = sessions.map(
+    (session) => ({
+      id: String(session.sessionId),
+
+      title: session.trainingTypeName,
+
+      start: `${session.date}T${session.startTime}`,
+      end: `${session.date}T${session.endTime}`,
+
+      extendedProps: {
+        session,
+        roomName: session.roomName,
+        trainerName: session.trainerName,
+        capacity: session.maxParticipants,
+      },
+    }),
+  );
+
+  const handleEventClick = (
+    info: EventClickArg,
+  ) => {
     setSelectedSession(info.event);
   };
 
@@ -22,11 +58,13 @@ function WeeklySchedule() {
     setSelectedSession(null);
   };
 
-  const handleEnroll = (sessionId: string) => {
-    console.log("Enroll in session:", sessionId);
-
-    // Αργότερα:
-    // await bookingService.enroll(sessionId);
+  const handleEnroll = (
+    sessionId: string,
+  ) => {
+    console.log(
+      "Enroll in session:",
+      sessionId,
+    );
 
     handleCloseDialog();
   };
@@ -34,9 +72,11 @@ function WeeklySchedule() {
   return (
     <div className="weekly-schedule">
       <FullCalendar
-        plugins={[timeGridPlugin, interactionPlugin]}
+        plugins={[
+          timeGridPlugin,
+          interactionPlugin,
+        ]}
         initialView="timeGridWeek"
-        initialDate="2026-07-27"
         firstDay={1}
         allDaySlot={false}
         slotMinTime="07:00:00"
@@ -44,10 +84,26 @@ function WeeklySchedule() {
         slotDuration="01:00:00"
         slotLabelInterval="01:00:00"
         nowIndicator
-        selectable
         expandRows
         height="auto"
         eventClick={handleEventClick}
+        events={events}
+        datesSet={(dateInfo) => {
+          const from =
+            dateInfo.startStr.slice(0, 10);
+
+          const endDate =
+            new Date(dateInfo.end);
+
+          endDate.setDate(
+            endDate.getDate() - 1,
+          );
+
+          const to =
+            endDate.toISOString().slice(0, 10);
+
+          onDatesChange(from, to);
+        }}
         dayHeaderFormat={{
           weekday: "short",
           day: "numeric",
@@ -68,53 +124,6 @@ function WeeklySchedule() {
           week: "Εβδομάδα",
           day: "Ημέρα",
         }}
-        events={[
-          {
-            id: "4",
-            title: "Yoga",
-            start: "2026-07-27T18:00:00",
-            end: "2026-07-27T19:00:00",
-            classNames: ["event-yoga"],
-            extendedProps: {
-              roomName: "Room A",
-              trainerName: "Maria Papadopoulou",
-              participants: 6,
-              capacity: 12,
-              description:
-                "Μάθημα yoga για κινητικότητα, ισορροπία και χαλάρωση.",
-            },
-          },
-          {
-            id: "5",
-            title: "CrossFit",
-            start: "2026-07-27T18:00:00",
-            end: "2026-07-27T19:00:00",
-            classNames: ["event-crossfit"],
-            extendedProps: {
-              roomName: "Room B",
-              trainerName: "Nikos Georgiou",
-              participants: 10,
-              capacity: 12,
-              description:
-                "Προπόνηση υψηλής έντασης με λειτουργικές ασκήσεις.",
-            },
-          },
-          {
-            id: "6",
-            title: "Pilates",
-            start: "2026-07-27T18:00:00",
-            end: "2026-07-27T19:00:00",
-            classNames: ["event-pilates"],
-            extendedProps: {
-              roomName: "Room C",
-              trainerName: "Eleni Nikolaou",
-              participants: 10,
-              capacity: 10,
-              description:
-                "Pilates με έμφαση στον κορμό και τη σωστή στάση σώματος.",
-            },
-          },
-        ]}
       />
 
       <SessionDetailsDialog

@@ -1,7 +1,49 @@
-import { Box, Container, Paper, Typography } from "@mui/material";
+import { useState } from "react";
+import {
+  Alert,
+  Box,
+  Container,
+  Paper,
+  Typography,
+} from "@mui/material";
+
 import WeeklySchedule from "../components/schedule/WeeklySchedule";
+import sessionService from "../services/sessionService";
+
+import type { TrainingSession } from "../types/session";
 
 function SchedulePage() {
+  const [sessions, setSessions] =
+    useState<TrainingSession[]>([]);
+
+  const [error, setError] = useState("");
+
+  const handleDatesChange = async (
+    from: string,
+    to: string,
+  ) => {
+    try {
+      setError("");
+
+      const data =
+        await sessionService.getPublishedSessions(
+          from,
+          to,
+        );
+
+      setSessions(data);
+    } catch (error) {
+      console.error(
+        "Failed to load published sessions:",
+        error,
+      );
+
+      setError(
+        "Δεν ήταν δυνατή η φόρτωση του προγράμματος.",
+      );
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -12,8 +54,6 @@ function SchedulePage() {
           "radial-gradient(circle at top left, rgba(59,130,246,0.12), transparent 35%), #090D16",
       }}
     >
-
-
       <Container maxWidth="xl">
         <Box sx={{ mb: 3 }}>
           <Typography
@@ -37,17 +77,28 @@ function SchedulePage() {
           </Typography>
         </Box>
 
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+
         <Paper
           elevation={0}
           sx={{
             p: { xs: 1.5, md: 3 },
             borderRadius: 4,
-            border: "1px solid rgba(148, 163, 184, 0.18)",
-            boxShadow: "0 24px 70px rgba(0,0,0,0.35)",
+            border:
+              "1px solid rgba(148, 163, 184, 0.18)",
+            boxShadow:
+              "0 24px 70px rgba(0,0,0,0.35)",
             overflow: "hidden",
           }}
         >
-          <WeeklySchedule />
+          <WeeklySchedule
+            sessions={sessions}
+            onDatesChange={handleDatesChange}
+          />
         </Paper>
       </Container>
     </Box>
