@@ -3,12 +3,9 @@ import { useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import bookingService from "../../services/bookingService";
 
-import type {
-  EventApi,
-  EventClickArg,
-  EventInput,
-} from "@fullcalendar/core";
+import type { EventApi, EventClickArg, EventInput } from "@fullcalendar/core";
 
 import SessionDetailsDialog from "./SessionDetailsDialog";
 import type { TrainingSession } from "../../types/session";
@@ -17,40 +14,35 @@ import "./weeklySchedule.css";
 
 type WeeklyScheduleProps = {
   sessions: TrainingSession[];
-  onDatesChange: (
-    from: string,
-    to: string,
-  ) => void;
+  onDatesChange: (from: string, to: string) => void;
+  onEnrollSuccess: () => void;
 };
 
 function WeeklySchedule({
   sessions,
   onDatesChange,
+  onEnrollSuccess,
 }: WeeklyScheduleProps) {
-  const [selectedSession, setSelectedSession] =
-    useState<EventApi | null>(null);
+  const [selectedSession, setSelectedSession] = useState<EventApi | null>(null);
 
-  const events: EventInput[] = sessions.map(
-    (session) => ({
-      id: String(session.sessionId),
+  const events: EventInput[] = sessions.map((session) => ({
+    id: String(session.sessionId),
 
-      title: session.trainingTypeName,
+    title: session.trainingTypeName,
 
-      start: `${session.date}T${session.startTime}`,
-      end: `${session.date}T${session.endTime}`,
+    start: `${session.date}T${session.startTime}`,
+    end: `${session.date}T${session.endTime}`,
 
-      extendedProps: {
-        session,
-        roomName: session.roomName,
-        trainerName: session.trainerName,
-        capacity: session.maxParticipants,
-      },
-    }),
-  );
+    extendedProps: {
+      session,
+      roomName: session.roomName,
+      trainerName: session.trainerName,
+      capacity: session.maxParticipants,
+      participants: session.currentEnrollments,
+    },
+  }));
 
-  const handleEventClick = (
-    info: EventClickArg,
-  ) => {
+  const handleEventClick = (info: EventClickArg) => {
     setSelectedSession(info.event);
   };
 
@@ -58,24 +50,30 @@ function WeeklySchedule({
     setSelectedSession(null);
   };
 
-  const handleEnroll = (
-    sessionId: string,
-  ) => {
-    console.log(
-      "Enroll in session:",
-      sessionId,
-    );
+  const [message, setMessage] = useState("");
 
-    handleCloseDialog();
+  const handleEnroll = async (sessionId: number) => {
+    try {
+      const response = await bookingService.enroll(sessionId);
+
+      if (response.status === "CONFIRMED") {
+        setMessage("Η κράτηση ολοκληρώθηκε επιτυχώς.");
+      } else if (response.status === "WAITING_LIST") {
+        setMessage("Μπήκες στη λίστα αναμονής.");
+      }
+
+      handleCloseDialog();
+
+      onEnrollSuccess();
+    } catch (error) {
+      console.error("Enroll failed:", error);
+    }
   };
 
   return (
     <div className="weekly-schedule">
       <FullCalendar
-        plugins={[
-          timeGridPlugin,
-          interactionPlugin,
-        ]}
+        plugins={[timeGridPlugin, interactionPlugin]}
         initialView="timeGridWeek"
         firstDay={1}
         allDaySlot={false}
@@ -89,18 +87,13 @@ function WeeklySchedule({
         eventClick={handleEventClick}
         events={events}
         datesSet={(dateInfo) => {
-          const from =
-            dateInfo.startStr.slice(0, 10);
+          const from = dateInfo.startStr.slice(0, 10);
 
-          const endDate =
-            new Date(dateInfo.end);
+          const endDate = new Date(dateInfo.end);
 
-          endDate.setDate(
-            endDate.getDate() - 1,
-          );
+          endDate.setDate(endDate.getDate() - 1);
 
-          const to =
-            endDate.toISOString().slice(0, 10);
+          const to = endDate.toISOString().slice(0, 10);
 
           onDatesChange(from, to);
         }}

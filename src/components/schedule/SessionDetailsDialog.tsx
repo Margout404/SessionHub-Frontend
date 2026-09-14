@@ -17,7 +17,7 @@ type SessionDetailsDialogProps = {
   open: boolean;
   session: EventApi | null;
   onClose: () => void;
-  onEnroll: (sessionId: string) => void;
+  onEnroll: (sessionId: number) => void;
 };
 
 function SessionDetailsDialog({
@@ -30,7 +30,7 @@ function SessionDetailsDialog({
     return null;
   }
 
-  const { roomName, trainerName, participants, capacity, description } =
+  const { roomName, trainerName, participants, capacity } =
     session.extendedProps;
 
   const availablePlaces = capacity - participants;
@@ -61,7 +61,7 @@ function SessionDetailsDialog({
   };
 
   const handleEnroll = () => {
-    onEnroll(session.id);
+    onEnroll(Number(session.id));
   };
 
   return (
@@ -94,9 +94,6 @@ function SessionDetailsDialog({
 
       <DialogContent>
         <Stack spacing={2.5}>
-          {description && (
-            <Typography color="text.secondary">{description}</Typography>
-          )}
 
           <Divider />
 
@@ -179,13 +176,8 @@ function SessionDetailsDialog({
           Κλείσιμο
         </Button>
 
-        <Button
-          type="button"
-          variant="contained"
-          disabled={isFull}
-          onClick={handleEnroll}
-        >
-          Enroll
+        <Button type="button" variant="contained" onClick={handleEnroll}>
+          {isFull ? "Join Waiting List" : "Enroll"}
         </Button>
       </DialogActions>
     </Dialog>

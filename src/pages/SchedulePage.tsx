@@ -13,10 +13,22 @@ import sessionService from "../services/sessionService";
 import type { TrainingSession } from "../types/session";
 
 function SchedulePage() {
+
   const [sessions, setSessions] =
     useState<TrainingSession[]>([]);
 
   const [error, setError] = useState("");
+
+const handleEnrollSuccess = () => {
+  if (currentRange) {
+    handleDatesChange(currentRange.from, currentRange.to);
+  }
+};
+
+  const [currentRange, setCurrentRange] = useState<{
+  from: string;
+  to: string;
+} | null>(null);
 
   const handleDatesChange = async (
     from: string,
@@ -95,10 +107,11 @@ function SchedulePage() {
             overflow: "hidden",
           }}
         >
-          <WeeklySchedule
-            sessions={sessions}
-            onDatesChange={handleDatesChange}
-          />
+<WeeklySchedule
+  sessions={sessions}
+  onDatesChange={handleDatesChange}
+  onEnrollSuccess={handleEnrollSuccess}
+/>
         </Paper>
       </Container>
     </Box>

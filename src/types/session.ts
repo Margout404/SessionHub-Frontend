@@ -32,6 +32,7 @@ export type TrainingSession = {
   endTime: string;
 
   maxParticipants: number;
+  currentEnrollments: number;
 
   status: SessionStatus;
 };
