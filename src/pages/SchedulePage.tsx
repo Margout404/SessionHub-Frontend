@@ -16,7 +16,6 @@ function SchedulePage() {
 
   const [sessions, setSessions] =
     useState<TrainingSession[]>([]);
-
   const [error, setError] = useState("");
 
 const handleEnrollSuccess = () => {
@@ -44,6 +43,8 @@ const handleEnrollSuccess = () => {
         );
 
       setSessions(data);
+
+      console.log("SESSIONS:", data);
     } catch (error) {
       console.error(
         "Failed to load published sessions:",
