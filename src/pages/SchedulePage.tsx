@@ -33,6 +33,7 @@ const handleEnrollSuccess = () => {
     from: string,
     to: string,
   ) => {
+      setCurrentRange({ from, to });
     try {
       setError("");
 

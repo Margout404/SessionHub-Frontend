@@ -50,7 +50,7 @@ function WeeklySchedule({
     setSelectedSession(null);
   };
 
-  const [message, setMessage] = useState("");
+  const [, setMessage] = useState("");
 
   const handleEnroll = async (sessionId: number) => {
     try {
