@@ -10,7 +10,10 @@ import type { EventApi, EventClickArg, EventInput } from "@fullcalendar/core";
 import SessionDetailsDialog from "./SessionDetailsDialog";
 import type { TrainingSession } from "../../types/session";
 
+import { Alert, Snackbar } from "@mui/material";
+
 import "./weeklySchedule.css";
+import axios from "axios";
 
 type WeeklyScheduleProps = {
   sessions: TrainingSession[];
@@ -25,10 +28,16 @@ function WeeklySchedule({
 }: WeeklyScheduleProps) {
   const [selectedSession, setSelectedSession] = useState<EventApi | null>(null);
 
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
   const events: EventInput[] = sessions.map((session) => ({
     id: String(session.sessionId),
 
-    title: session.trainingTypeName,
+    title:
+      session.userBooked === "ENROLLED"
+        ? `✓ ${session.trainingTypeName}`
+        : session.trainingTypeName,
 
     start: `${session.date}T${session.startTime}`,
     end: `${session.date}T${session.endTime}`,
@@ -39,7 +48,9 @@ function WeeklySchedule({
       trainerName: session.trainerName,
       capacity: session.maxParticipants,
       participants: session.currentEnrollments,
+      userBooked: session.userBooked,
     },
+    classNames: session.userBooked === "ENROLLED" ? ["session-enrolled"] : [],
   }));
 
   const handleEventClick = (info: EventClickArg) => {
@@ -50,23 +61,34 @@ function WeeklySchedule({
     setSelectedSession(null);
   };
 
-  const [, setMessage] = useState("");
+  // const [, setMessage] = useState("");
 
   const handleEnroll = async (sessionId: number) => {
     try {
+      setErrorMessage("");
+
       const response = await bookingService.enroll(sessionId);
 
       if (response.status === "CONFIRMED") {
-        setMessage("Η κράτηση ολοκληρώθηκε επιτυχώς.");
+        setSuccessMessage("Η κράτηση ολοκληρώθηκε επιτυχώς.");
       } else if (response.status === "WAITING_LIST") {
-        setMessage("Μπήκες στη λίστα αναμονής.");
+        setSuccessMessage("Μπήκες στη λίστα αναμονής.");
       }
 
       handleCloseDialog();
-
       onEnrollSuccess();
     } catch (error) {
-      console.error("Enroll failed:", error);
+      if (axios.isAxiosError(error)) {
+        const backendMessage = error.response?.data?.message;
+
+        setErrorMessage(
+          backendMessage ?? "Δεν ήταν δυνατή η ολοκλήρωση της κράτησης.",
+        );
+
+        return;
+      }
+
+      setErrorMessage("Παρουσιάστηκε κάποιο απρόσμενο σφάλμα.");
     }
   };
 
@@ -125,6 +147,34 @@ function WeeklySchedule({
         onClose={handleCloseDialog}
         onEnroll={handleEnroll}
       />
+
+      <Snackbar
+        open={Boolean(errorMessage)}
+        autoHideDuration={4000}
+        onClose={() => setErrorMessage("")}
+      >
+        <Alert
+          severity="error"
+          variant="filled"
+          onClose={() => setErrorMessage("")}
+        >
+          {errorMessage}
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={Boolean(successMessage)}
+        autoHideDuration={3000}
+        onClose={() => setSuccessMessage("")}
+      >
+        <Alert
+          severity="success"
+          variant="filled"
+          onClose={() => setSuccessMessage("")}
+        >
+          {successMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }

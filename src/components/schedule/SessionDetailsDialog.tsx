@@ -30,9 +30,10 @@ function SessionDetailsDialog({
     return null;
   }
 
-  const { roomName, trainerName, participants, capacity } =
+  const { roomName, trainerName, participants, capacity, userBooked } =
     session.extendedProps;
 
+  const isEnrolled = userBooked === "ENROLLED";
   const availablePlaces = capacity - participants;
   const isFull = availablePlaces <= 0;
 
@@ -94,7 +95,6 @@ function SessionDetailsDialog({
 
       <DialogContent>
         <Stack spacing={2.5}>
-
           <Divider />
 
           <Box>
@@ -168,6 +168,12 @@ function SessionDetailsDialog({
               Η συγκεκριμένη προπόνηση είναι πλήρης.
             </Alert>
           )}
+
+          {isEnrolled && (
+            <Alert severity="success">
+              Έχεις ήδη κάνει κράτηση σε αυτή την προπόνηση.
+            </Alert>
+          )}
         </Stack>
       </DialogContent>
 
@@ -176,8 +182,13 @@ function SessionDetailsDialog({
           Κλείσιμο
         </Button>
 
-        <Button type="button" variant="contained" onClick={handleEnroll}>
-          {isFull ? "Join Waiting List" : "Enroll"}
+        <Button
+          type="button"
+          variant="contained"
+          disabled={isEnrolled}
+          onClick={handleEnroll}
+        >
+          {isEnrolled ? "Enrolled" : isFull ? "Join Waiting List" : "Enroll"}
         </Button>
       </DialogActions>
     </Dialog>

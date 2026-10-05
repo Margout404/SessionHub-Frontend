@@ -35,6 +35,8 @@ export type TrainingSession = {
   currentEnrollments: number;
 
   status: SessionStatus;
+
+  userBooked: UserBooked;
 };
 
 export type SessionFormData = {
@@ -87,3 +89,6 @@ export type CreateSessionResponse = {
   sessionId: number;
   message: string;
 };
+export type UserBooked =
+  | "ENROLLED"
+  | "NOT_ENROLLED";

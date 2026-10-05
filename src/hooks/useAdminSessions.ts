@@ -24,6 +24,7 @@ const initialSessions: TrainingSession[] = [
     currentEnrollments: 0,
 
     status: "SCHEDULED",
+    userBooked: "NOT_ENROLLED",
   },
   {
     sessionId: 2,
@@ -44,6 +45,7 @@ const initialSessions: TrainingSession[] = [
     currentEnrollments: 0,
 
     status: "DRAFT",
+    userBooked: "NOT_ENROLLED",
   },
 ];
 
@@ -84,6 +86,7 @@ export function useAdminSessions() {
       currentEnrollments: 0,
 
       status: formData.status,
+      userBooked: "NOT_ENROLLED",
     };
 
     setSessions((currentSessions) => [...currentSessions, newSession]);

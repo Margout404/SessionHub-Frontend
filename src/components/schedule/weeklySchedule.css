@@ -145,6 +145,9 @@
 .weekly-schedule .fc .event-pilates {
   background: linear-gradient(135deg, #2563eb, #1e3a8a);
 }
+.session-enrolled {
+  box-shadow: inset 0 0 0 2px rgba(76, 175, 80, 0.8);
+}
 
 /* mobile */
 @media (max-width: 900px) {
